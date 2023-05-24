@@ -1,0 +1,44 @@
+version: "2.2"
+
+services:
+  core:
+    build: src/
+    restart: always
+    environment:
+      BOT_NICKNAME: "Bot"
+      UTOPIA_HOST: "enticer-utopia-api"
+      UTOPIA_TOKEN: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+      UTOPIA_PORT: "22825"
+      UTOPIA_WS_PORT: "25000"
+      CHAT_IDS: ""
+    depends_on:
+      - utopia-api
+      - db
+    networks:
+      - unetwork
+    stdin_open: true
+    tty: true
+
+  utopia-api:
+    image: uto9234/utopia-api
+    hostname: enticer-utopia-api
+    restart: always
+    ports:
+      - 22825:22825
+    environment:
+      XDG_RUNTIME_DIR: /tmp/runtime-root
+    networks:
+      - unetwork
+    volumes:
+      - type: bind
+        source: ./account.db
+        target: /app/account.db
+    logging:
+      driver: "local"
+      options:
+        max-size: "5m"
+        max-file: "5"
+
+networks:
+  unetwork:
+    driver: bridge
