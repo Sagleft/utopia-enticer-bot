@@ -10,6 +10,8 @@ services:
       UTOPIA_TOKEN: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
       UTOPIA_PORT: "22825"
       UTOPIA_WS_PORT: "25000"
+      ACTION_TIMEOUT_HOURS: "6"
+      DEBUG_IMMEDIATELY_START: "true"
       CHAT_IDS: ""
     depends_on:
       - utopia-api

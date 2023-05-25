@@ -3,7 +3,10 @@ package main
 import (
 	"log"
 
+	swissknife "github.com/Sagleft/swiss-knife"
 	"github.com/Sagleft/uchatbot-engine"
+	"github.com/fatih/color"
+	simplecron "github.com/sagleft/simple-cron"
 )
 
 const APIToken = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -15,12 +18,22 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	actionTimeout, err := getCronDuration()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	actionOnStart, err := getDebugImedStart()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	chats, err := getChats()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	_, err = uchatbot.NewChatBot(uchatbot.ChatBotData{
+	bot, err := uchatbot.NewChatBot(uchatbot.ChatBotData{
 		Config: cfg,
 		Chats:  chats,
 		Callbacks: uchatbot.ChatBotCallbacks{
@@ -35,4 +48,12 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	simplecron.NewCronHandler(func() {
+		if err := sendMessages(bot.GetClient(), chats); err != nil {
+			color.Red("send messages: %s", err.Error())
+		}
+	}, actionTimeout).Run(actionOnStart)
+
+	swissknife.RunInBackground()
 }

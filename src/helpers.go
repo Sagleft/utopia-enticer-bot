@@ -1,11 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Sagleft/uchatbot-engine"
 	utopiago "github.com/Sagleft/utopialib-go/v2"
@@ -41,6 +43,34 @@ func getConfig() (utopiago.Config, error) {
 	cfg.WsPort = int(apiWsPort)
 
 	return cfg, nil
+}
+
+func getCronDuration() (time.Duration, error) {
+	timeoutHoursRaw := os.Getenv("ACTION_TIMEOUT_HOURS")
+	if timeoutHoursRaw == "" {
+		return 0, errors.New("action timeout is not set")
+	}
+
+	timeoutHours, err := strconv.ParseInt(timeoutHoursRaw, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("parse action timeout: %w", err)
+	}
+
+	return time.Hour * time.Duration(timeoutHours), nil
+}
+
+func getDebugImedStart() (bool, error) {
+	paramRaw := os.Getenv("DEBUG_IMMEDIATELY_START")
+	if paramRaw == "" {
+		return false, nil
+	}
+
+	paramVal, err := strconv.ParseBool(paramRaw)
+	if err != nil {
+		return false, fmt.Errorf("parse debug param: %w", err)
+	}
+
+	return paramVal, nil
 }
 
 func getChats() ([]uchatbot.Chat, error) {
