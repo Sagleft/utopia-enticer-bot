@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	swissknife "github.com/Sagleft/swiss-knife"
 	"github.com/Sagleft/uchatbot-engine"
@@ -10,6 +11,8 @@ import (
 )
 
 const APIToken = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+const chatIDsGroupSeparator = ";"
+const groupElementsSeparator = ":"
 const chatIDsSeparator = ","
 
 func main() {
@@ -28,14 +31,14 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	chats, err := getChats()
+	chats, err := getChats(os.Getenv("CHAT_IDS"))
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	bot, err := uchatbot.NewChatBot(uchatbot.ChatBotData{
 		Config: cfg,
-		Chats:  chats,
+		Chats:  getChatsFromCfg(chats),
 		Callbacks: uchatbot.ChatBotCallbacks{
 			OnContactMessage:        OnContactMessage,
 			OnChannelMessage:        OnChannelMessage,

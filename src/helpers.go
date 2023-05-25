@@ -73,23 +73,42 @@ func getDebugImedStart() (bool, error) {
 	return paramVal, nil
 }
 
-func getChats() ([]uchatbot.Chat, error) {
-	chatIDsRaw := os.Getenv("CHAT_IDS")
+func getChats(chatIDsRaw string) (chatsConfig, error) {
 	if chatIDsRaw == "" {
-		return nil, fmt.Errorf(
+		return chatsConfig{}, fmt.Errorf(
 			"chat ids is not set. " +
 				"it is necessary to specify the channel ID " +
 				"in the corresponding parameter, separated by commas",
 		)
 	}
 
-	chats := []uchatbot.Chat{}
-	chatIDs := strings.Split(chatIDsRaw, chatIDsSeparator)
-	for i, chatID := range chatIDs {
-		chats[i] = uchatbot.Chat{ID: chatID}
+	r := chatsConfig{}
+	var lastError error
+
+	chatGroups := strings.Split(chatIDsRaw, chatIDsGroupSeparator)
+	for _, chatGroup := range chatGroups {
+		groupElements := strings.Split(chatGroup, groupElementsSeparator)
+		if len(groupElements) != 2 {
+			lastError = errors.New("invalid chat ids structure. see readme")
+		}
+
+		channelFromID := groupElements[0]
+		chatIDs := strings.Split(groupElements[1], chatIDsSeparator)
+
+		for _, chatID := range chatIDs {
+			r[channelFromID] = append(r[channelFromID], uchatbot.Chat{ID: chatID})
+		}
 	}
 
-	return chats, nil
+	return r, lastError
+}
+
+func getChatsFromCfg(cfg chatsConfig) []uchatbot.Chat {
+	c := []uchatbot.Chat{}
+	for _, v := range cfg {
+		c = append(c, v...)
+	}
+	return c
 }
 
 func onError(err error) {
