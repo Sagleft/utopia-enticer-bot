@@ -42,3 +42,9 @@ An `;` has been added here to separate the setting groups.
 ## How to disable bot in my channel?
 
 Just add new hashtag to your channel: `no-bots`
+
+## useful links
+
+* [Utopia official website](https://u.is/)
+
+* [UDocs](https://udocs.gitbook.io/utopia-api/)
