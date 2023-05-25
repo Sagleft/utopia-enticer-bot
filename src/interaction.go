@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Sagleft/uchatbot-engine"
 	utopiago "github.com/Sagleft/utopialib-go/v2"
 	"github.com/Sagleft/utopialib-go/v2/pkg/structs"
 )
@@ -30,8 +29,10 @@ func OnWelcomeMessage(userPubkey string) string {
 }
 
 func sendMessages(client utopiago.Client, chatsCfg chatsConfig) error {
-	for fromChannel, chats := range chatsCfg {
-		if err := handleAdToChannels(client, fromChannel, chats); err != nil {
+	revCfg := reverseChatCfg(chatsCfg)
+
+	for toChannelID, adChannels := range revCfg {
+		if err := handleAdToChannels(client, adChannels, toChannelID); err != nil {
 			return fmt.Errorf("handle channel: %w", err)
 		}
 	}
@@ -44,20 +45,10 @@ func isBotDeactivatedInChannel(channelHashTags string) bool {
 
 func handleAdToChannels(
 	client utopiago.Client,
-	adChannelID string,
-	toChatIDs []uchatbot.Chat,
+	adChannels fromChannelsCfg,
+	toChannelID string,
 ) error {
-	for _, chat := range toChatIDs {
-		if err := handleAd(client, adChannelID, chat.ID); err != nil {
-			return fmt.Errorf("handle ad: %w", err)
-		}
-	}
-
-	return nil
-}
-
-func handleAd(client utopiago.Client, adChannelID string, toChatID string) error {
-	channelData, err := client.GetChannelInfo(adChannelID)
+	channelData, err := client.GetChannelInfo(toChannelID)
 	if err != nil {
 		return fmt.Errorf("get channel info: %w", err)
 	}
@@ -66,7 +57,11 @@ func handleAd(client utopiago.Client, adChannelID string, toChatID string) error
 		return nil // skip channel
 	}
 
-	// TODO
+	for adChannelID, _ := range adChannels {
+		/*if err := handleAd(client, adChannelID, chat.ID); err != nil {
+			return fmt.Errorf("handle ad: %w", err)
+		}*/
+	}
 
 	return nil
 }

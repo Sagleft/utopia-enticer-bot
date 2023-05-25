@@ -114,3 +114,19 @@ func getChatsFromCfg(cfg chatsConfig) []uchatbot.Chat {
 func onError(err error) {
 	color.Red(err.Error())
 }
+
+func reverseChatCfg(cfg chatsConfig) chatsConfigReversed {
+	r := chatsConfigReversed{}
+
+	for fromChannelID, chats := range cfg {
+		for _, channelData := range chats {
+			if _, isExists := r[channelData.ID]; !isExists {
+				r[channelData.ID] = make(fromChannelsCfg)
+			}
+
+			r[channelData.ID][fromChannelID] = struct{}{}
+		}
+	}
+
+	return r
+}
