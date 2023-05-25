@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	utopiago "github.com/Sagleft/utopialib-go/v2"
@@ -57,11 +58,76 @@ func handleAdToChannels(
 		return nil // skip channel
 	}
 
-	for adChannelID, _ := range adChannels {
-		/*if err := handleAd(client, adChannelID, chat.ID); err != nil {
-			return fmt.Errorf("handle ad: %w", err)
-		}*/
+	// TODO: filter: how many messages have been written in the chat
+	// since the last mention of these channels
+
+	adWelcome := os.Getenv("AD_MESSAGE1") // TODO
+
+	messages, err := getAdMessages(client, adChannels, adWelcome)
+	if err != nil {
+		return fmt.Errorf("get ad messages: %w", err)
 	}
 
+	for _, msg := range messages {
+		if _, err := client.SendChannelMessage(toChannelID, msg); err != nil {
+			return fmt.Errorf("send channel message: %w", err)
+		}
+	}
 	return nil
+}
+
+func getAdMessages(
+	client utopiago.Client,
+	adChannels fromChannelsCfg,
+	adWeclome string,
+) ([]string, error) {
+	if len(adChannels) == 1 {
+		return getAdMessagesForSingleChannel(adChannels, adWeclome), nil
+	}
+
+	return getAdMessagesForChannels(client, adChannels, adWeclome)
+}
+
+func getAdMessagesForSingleChannel(adChannels fromChannelsCfg, adWeclome string) []string {
+	var lastChannelID string
+	for adChannelID := range adChannels {
+		lastChannelID = adChannelID
+	}
+
+	return []string{
+		adWeclome,
+		lastChannelID,
+	}
+}
+
+func getAdMessagesForChannels(
+	client utopiago.Client,
+	adChannels fromChannelsCfg,
+	adWeclome string,
+) ([]string, error) {
+	var lines []string
+	for adChannelID := range adChannels {
+		channelData, err := client.GetChannelInfo(adChannelID)
+		if err != nil {
+			return nil, fmt.Errorf("get channel info: %w", err)
+		}
+
+		lines = append(lines, getChannelLine(channelData, adChannelID))
+	}
+
+	return []string{
+		fmt.Sprintf(
+			"%s\n\n%s",
+			adWeclome,
+			strings.Join(lines, "\n"),
+		),
+	}, nil
+}
+
+func getChannelLine(channelData structs.ChannelData, ID string) string {
+	return fmt.Sprintf(
+		"%s %s",
+		channelData.Title,
+		ID,
+	)
 }
