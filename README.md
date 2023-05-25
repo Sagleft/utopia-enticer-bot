@@ -17,6 +17,8 @@ TODO:
 
 ## SETUP
 
+You must place the account file `account.db` with the password `password` in the directory. You can compress the account file by clearing it through the GUI client: `File -> Export Database..`
+
 It is sufficient to change the parameters in file `docker-compose.yml`
 
 * `UTOPIA_` - parameters to connect to the client. When working with the docker, these parameters do not need to be changed.
