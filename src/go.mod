@@ -4,16 +4,16 @@ go 1.19
 
 require (
 	github.com/Sagleft/swiss-knife v1.0.8
-	github.com/Sagleft/uchatbot-engine v1.9.2
-	github.com/Sagleft/utopialib-go/v2 v2.8.1
+	github.com/Sagleft/uchatbot-engine v1.9.3
+	github.com/Sagleft/utopialib-go/v2 v2.8.2
 	github.com/fatih/color v1.15.0
 	github.com/sagleft/simple-cron v1.5.0
 	github.com/stretchr/testify v1.8.1
 )
 
 require (
+	github.com/Sagleft/evtwebsocket v1.0.0 // indirect
 	github.com/beefsack/go-rate v0.0.0-20220214233405-116f4ca011a0 // indirect
-	github.com/ctengiz/evtwebsocket v0.0.0-20180717104640-fc3583982591 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
